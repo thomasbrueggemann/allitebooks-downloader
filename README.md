@@ -10,9 +10,8 @@ $ npm i
 
 ## Run
 
-````bash
+```bash
 $ npm start
-```touch
+```
 
 This will create a folder for each eBook containing the eBook itself (pdf or zip file) and a txt file containing a description text of the book.
-````
