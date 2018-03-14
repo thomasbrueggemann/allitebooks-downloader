@@ -4,7 +4,8 @@
 	"description": "Scrapes and downloads all IT eBooks from allitebooks.com",
 	"main": "main.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"start": "node --experimental-modules main.js",
+		"test": "jest --coverage --verbose"
 	},
 	"repository": {
 		"type": "git",
@@ -28,6 +29,31 @@
 		"arrowParens": "always"
 	},
 	"dependencies": {
-		"fs-then-native": "^2.0.0"
+		"cheerio": "^1.0.0-rc.2",
+		"fs-then-native": "^2.0.0",
+		"request": "^2.83.0",
+		"request-promise-native": "^1.0.5"
+	},
+	"devDependencies": {
+		"jest": "^22.4.2"
+	},
+	"jest": {
+		"collectCoverageFrom": [
+			"*.js",
+			"!tests/**/*.test.js",
+			"!main.js"
+		],
+		"coverageThreshold": {
+			"global": {
+				"statements": 80,
+				"branches": 80,
+				"functions": 80,
+				"lines": 80
+			}
+		},
+		"moduleDirectories": [
+			"node_modules"
+		],
+		"testRegex": "tests/.*\\.test\\.js$"
 	}
 }

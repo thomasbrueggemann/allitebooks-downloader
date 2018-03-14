@@ -27,11 +27,9 @@ class Boats24Scraper extends Scraper {
 	 */
 	parseDetailPages() {
 		return this.$("h2[class='entry-title']")
-			.children("a")
+			.find("a")
 			.map((i, el) => {
-				return cheerio(el)
-					.find("a")
-					.attr("href");
+				return cheerio(el).attr("href");
 			})
 			.get();
 	}
@@ -43,19 +41,29 @@ class Boats24Scraper extends Scraper {
 	 */
 	async parseDetailPage() {
 		// find download links
-		const links = this.$("span[class='download-links']")
+		const files = this.$("span[class='download-links']")
 			.children("a")
 			.map((i, el) => {
 				// extract href from all links
 				return cheerio(el).attr("href");
 			})
-			.get();
+			.get()
+			.filter((h) => {
+				return h.indexOf("file.allitebooks.com") >= 0;
+			})
+			.map((h) => {
+				const parts = h.split("/");
+				return {
+					url: h,
+					name: parts[parts.length - 1]
+				};
+			});
 
-		const description = this.$("article[class='post]").text();
+		const description = this.$("article[class~='post']").text();
 
 		return {
-			links,
-			description
+			files: files,
+			description: description
 		};
 	}
 }

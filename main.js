@@ -22,9 +22,9 @@ async.doWhilst(
 		const detailUrls = scraper.parseDetailPages();
 
 		// async loop over etail urls and download them
-		async.eachLimit(
+		await async.eachLimit(
 			detailUrls,
-			5,
+			10,
 			async (detailUrl) => {
 				// parse the detail page
 				console.log("DETAIL:", detailUrl);
@@ -34,9 +34,9 @@ async.doWhilst(
 					.replace("http://www.allitebooks.com/", "")
 					.replace("/", "");
 				const eBookFolderPath = path.join(__dirname, DOWNLOAD_DIR + "/" + eBookSlug);
-				const alradyDownloaded = await fs.stat(eBookFolderPath);
+				const alreadyDownloaded = await fs.stat(eBookFolderPath);
 
-				if (alradyDownloaded) {
+				if (alreadyDownloaded) {
 					console.log("→ skipped");
 					return;
 				}
@@ -46,25 +46,26 @@ async.doWhilst(
 				const ebook = await scraper.parseDetailPage(listing || null);
 
 				// download ebook pdfs or zips
-				async.each(ebook.links, async (link) => {
-					var file = fs.createWriteStream(eBookFolderPath + "/" + link);
-					http.get(link, (response) => {
-						response.pipe(file);
+				async.each(ebook.files, async (file) => {
+					var writeTo = fs.createWriteStream(eBookFolderPath + "/" + file.name);
+					http.get(file.url, (response) => {
+						response.pipe(writeTo);
 					});
 				});
 
 				// download description text
-				// ...
+				await fs.writeFile(eBookFolderPath + "description.txt", "Hey there!");
 
 				return;
 			},
 			(err) => {
 				if (err) console.log(err);
-
-				// parse the next page url
-				return scraper.parseNextPage();
 			}
 		);
+
+		// parse the next page url
+		pageUrl = scraper.parseNextPage();
+		return pageUrl;
 	},
 	(pageUrl) => {
 		return pageUrl !== null;
