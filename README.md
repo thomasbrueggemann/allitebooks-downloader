@@ -1,4 +1,4 @@
-# 📚 allitebooks-downloader
+# 📚 All IT eBooks Downloader [![Build Status](https://travis-ci.org/thomasbrueggemann/allitebooks-downloader.svg?branch=master)](https://travis-ci.org/thomasbrueggemann/allitebooks-downloader)
 
 Scrapes and downloads all IT eBooks
 

@@ -22,7 +22,7 @@ async.doWhilst(
 		const detailUrls = scraper.parseDetailPages();
 
 		// async loop over etail urls and download them
-		await async.eachLimit(
+		async.eachLimit(
 			detailUrls,
 			10,
 			async (detailUrl) => {
