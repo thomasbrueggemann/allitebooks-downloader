@@ -1,0 +1,33 @@
+{
+	"name": "allitebooks-downloader",
+	"version": "1.0.0",
+	"description": "Scrapes and downloads all IT eBooks from allitebooks.com",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/thomasbrueggemann/allitebooks-downloader.git"
+	},
+	"keywords": [
+		"allitebooks",
+		"ebooks",
+		"scraper"
+	],
+	"author": "Thomas Brüggemann",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/thomasbrueggemann/allitebooks-downloader/issues"
+	},
+	"homepage": "https://github.com/thomasbrueggemann/allitebooks-downloader#readme",
+	"prettier": {
+		"printWidth": 100,
+		"useTabs": true,
+		"tabWidth": 4,
+		"arrowParens": "always"
+	},
+	"dependencies": {
+		"fs-then-native": "^2.0.0"
+	}
+}
