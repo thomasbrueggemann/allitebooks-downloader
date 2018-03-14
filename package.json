@@ -5,7 +5,8 @@
 	"main": "main.js",
 	"scripts": {
 		"start": "node --experimental-modules main.js",
-		"test": "jest --coverage --verbose"
+		"test": "jest --coverage --verbose",
+		"clean": "rm -R ./data/*"
 	},
 	"repository": {
 		"type": "git",
@@ -29,8 +30,10 @@
 		"arrowParens": "always"
 	},
 	"dependencies": {
+		"await-fs": "^1.0.0",
 		"cheerio": "^1.0.0-rc.2",
-		"fs-then-native": "^2.0.0",
+		"download": "^6.2.5",
+		"make-dir": "^1.2.0",
 		"request": "^2.83.0",
 		"request-promise-native": "^1.0.5"
 	},

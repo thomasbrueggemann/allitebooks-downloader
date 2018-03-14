@@ -1,18 +1,19 @@
 const async = require("async");
-const fs = require("fs-then-native");
+const fs = require("await-fs");
 const path = require("path");
 const eBookScraper = require("./ebook.scraper");
-const http = require("http");
+const mkdir = require("make-dir");
+const download = require("download");
 
 const DOWNLOAD_DIR = "./data";
 
-// init scraper
-const scraper = new eBookScraper();
-var pageUrl = scraper.overviewUrl;
+(async () => {
+	// init scraper
+	const scraper = new eBookScraper();
+	var pageUrl = scraper.overviewUrl;
 
-// parse a single overview page until no new page is available
-async.doWhilst(
-	async () => {
+	// parse a single overview page until no new page is available
+	do {
 		console.log("PAGE:", pageUrl);
 
 		// load the overview page to scrape from
@@ -21,53 +22,49 @@ async.doWhilst(
 		// parse all detail pages of this overview page
 		const detailUrls = scraper.parseDetailPages();
 
-		// async loop over etail urls and download them
-		async.eachLimit(
-			detailUrls,
-			10,
-			async (detailUrl) => {
-				// parse the detail page
-				console.log("DETAIL:", detailUrl);
-
-				// check if we already downloaded this ebook by checking if a coherent folder exists
-				const eBookSlug = detailUrl
-					.replace("http://www.allitebooks.com/", "")
-					.replace("/", "");
-				const eBookFolderPath = path.join(__dirname, DOWNLOAD_DIR + "/" + eBookSlug);
-				const alreadyDownloaded = await fs.stat(eBookFolderPath);
-
-				if (alreadyDownloaded) {
-					console.log("→ skipped");
-					return;
-				}
-
-				// parse the detail page
-				await scraper.load(detailUrl);
-				const ebook = await scraper.parseDetailPage(listing || null);
-
-				// download ebook pdfs or zips
-				async.each(ebook.files, async (file) => {
-					var writeTo = fs.createWriteStream(eBookFolderPath + "/" + file.name);
-					http.get(file.url, (response) => {
-						response.pipe(writeTo);
-					});
-				});
-
-				// download description text
-				await fs.writeFile(eBookFolderPath + "description.txt", "Hey there!");
-
-				return;
-			},
-			(err) => {
-				if (err) console.log(err);
-			}
-		);
-
 		// parse the next page url
 		pageUrl = scraper.parseNextPage();
-		return pageUrl;
-	},
-	(pageUrl) => {
-		return pageUrl !== null;
-	}
-);
+
+		// async loop over etail urls and download them
+		for (const detailUrl of detailUrls) {
+			// parse the detail page
+			console.log("DETAIL:", detailUrl);
+
+			// check if we already downloaded this ebook by checking if a coherent folder exists
+			const eBookNameSlug = detailUrl
+				.replace("http://www.allitebooks.com/", "")
+				.replace("/", "");
+			const eBookFolderPath = path.join(__dirname, DOWNLOAD_DIR + "/" + eBookNameSlug);
+
+			var alreadyDownloaded = false;
+			try {
+				alreadyDownloaded = await fs.stat(eBookFolderPath);
+			} catch (e) {
+				alreadyDownloaded = false;
+				await mkdir(eBookFolderPath);
+			}
+
+			if (alreadyDownloaded) {
+				console.log("→ skipped");
+				continue;
+			}
+
+			try {
+				// parse the detail page
+				await scraper.load(detailUrl);
+				const ebook = await scraper.parseDetailPage();
+
+				// download description text
+				fs.writeFile(eBookFolderPath + "/description.txt", ebook.description);
+
+				// download ebook pdfs or zips
+				for (const file of ebook.files) {
+					const data = await download(file.url);
+					fs.writeFile(eBookFolderPath + "/" + file.name, data);
+				}
+			} catch (e) {
+				console.log(e);
+			}
+		}
+	} while (pageUrl !== null);
+})();
