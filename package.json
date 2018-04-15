@@ -34,6 +34,7 @@
 		"cheerio": "^1.0.0-rc.2",
 		"download": "^6.2.5",
 		"make-dir": "^1.2.0",
+		"progress": "^2.0.0",
 		"request": "^2.83.0",
 		"request-promise-native": "^1.0.5"
 	},

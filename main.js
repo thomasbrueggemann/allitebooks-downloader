@@ -4,8 +4,16 @@ const path = require("path");
 const eBookScraper = require("./ebook.scraper");
 const mkdir = require("make-dir");
 const download = require("download");
+const ProgressBar = require("progress");
 
-const DOWNLOAD_DIR = "./data";
+const DOWNLOAD_DIR = process.argv[2];
+
+const bar = new ProgressBar("[:bar] :percent :etas", {
+	complete: "=",
+	incomplete: " ",
+	width: 20,
+	total: 0
+});
 
 (async () => {
 	// init scraper
@@ -34,7 +42,7 @@ const DOWNLOAD_DIR = "./data";
 			const eBookNameSlug = detailUrl
 				.replace("http://www.allitebooks.com/", "")
 				.replace("/", "");
-			const eBookFolderPath = path.join(__dirname, DOWNLOAD_DIR + "/" + eBookNameSlug);
+			const eBookFolderPath = DOWNLOAD_DIR + "/" + eBookNameSlug;
 
 			var alreadyDownloaded = false;
 			try {
@@ -59,7 +67,10 @@ const DOWNLOAD_DIR = "./data";
 
 				// download ebook pdfs or zips
 				for (const file of ebook.files) {
-					const data = await download(file.url);
+					const data = await download(file.url).on("response", (res) => {
+						bar.total = res.headers["content-length"];
+						res.on("data", (data) => bar.tick(data.length));
+					});
 					fs.writeFile(eBookFolderPath + "/" + file.name, data);
 				}
 			} catch (e) {
