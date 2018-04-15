@@ -8,13 +8,6 @@ const ProgressBar = require("progress");
 
 const DOWNLOAD_DIR = process.argv[2];
 
-const bar = new ProgressBar("[:bar] :percent :etas", {
-	complete: "=",
-	incomplete: " ",
-	width: 20,
-	total: 0
-});
-
 (async () => {
 	// init scraper
 	const scraper = new eBookScraper();
@@ -35,6 +28,13 @@ const bar = new ProgressBar("[:bar] :percent :etas", {
 
 		// async loop over etail urls and download them
 		for (const detailUrl of detailUrls) {
+			let bar = new ProgressBar("[:bar] :percent :etas", {
+				complete: "=",
+				incomplete: " ",
+				width: 20,
+				total: 0
+			});
+
 			// parse the detail page
 			console.log("DETAIL:", detailUrl);
 
